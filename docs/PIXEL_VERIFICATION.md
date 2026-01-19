@@ -314,8 +314,10 @@ engine/
 ├── core.py            # Integration with AutomationEngine
 └── runtime.py         # User-facing API
 
-momotalk/
-├── pick_pixels.py     # Interactive pixel picker tool
+debug/
+└── pick_pixels.py     # Interactive pixel picker tool
+
+your-app/
 └── script.py          # User script with verification calls
 ```
 

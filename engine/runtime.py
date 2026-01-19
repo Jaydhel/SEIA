@@ -38,9 +38,10 @@ def _colored(text: str, color: str) -> str:
 
 
 BASE_DIR = os.path.dirname(__file__)
-_marker_dirs = [
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
+_template_dirs = [
     os.path.join(os.getcwd(), "templates"),
-    os.path.join(BASE_DIR, "templates"),
+    os.path.join(ROOT_DIR, "templates"),
 ]
 
 _engine: AutomationEngine | None = None
@@ -66,8 +67,7 @@ def _resolve_config_path() -> str:
     cwd_path = os.path.join(os.getcwd(), "config.json")
     if os.path.exists(cwd_path):
         return cwd_path
-    repo_root = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
-    root_path = os.path.join(repo_root, "config.json")
+    root_path = os.path.join(ROOT_DIR, "config.json")
     if os.path.exists(root_path):
         return root_path
     return cwd_path
@@ -89,19 +89,23 @@ def _ensure_engine() -> AutomationEngine:
     return _engine
 
 
-def set_marker_dir(path: str) -> None:
+def set_template_dir(path: str) -> None:
     if path:
-        _marker_dirs.insert(0, path)
+        _template_dirs.insert(0, path)
+
+
+def set_marker_dir(path: str) -> None:
+    set_template_dir(path)
 
 
 def _resolve_path(name: str) -> str:
     if os.path.isabs(name) or os.path.exists(name):
         return name
-    for base in _marker_dirs:
+    for base in _template_dirs:
         candidate = os.path.join(base, name)
         if os.path.exists(candidate):
             return candidate
-    return os.path.join(_marker_dirs[0], name)
+    return os.path.join(_template_dirs[0], name)
 
 
 def _get_config_path() -> str:

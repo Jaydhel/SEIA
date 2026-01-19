@@ -3,7 +3,12 @@
 This repo provides two entry points:
 
 - Debug harness: `python debug\debug.py`
-- Simple scripts: `python momotalk\script.py`
+- Simple scripts: `python script.py` (run from your project folder). Example:
+
+```powershell
+Set-Location scripts\momotalk
+python script.py
+```
 
 ## Setup
 

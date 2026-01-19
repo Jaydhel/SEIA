@@ -2,6 +2,7 @@
 Pixel Color Picker Tool
 Helps you find good verification pixels for your template images.
 """
+import os
 import cv2
 import sys
 
@@ -81,4 +82,5 @@ if __name__ == "__main__":
         pick_pixels(sys.argv[1])
     else:
         # Default to statecheck4.png
-        pick_pixels(r"C:\Users\Lychwee\Documents\GitHub\ba-helper\momotalk\marker\statecheck4.png")
+        default_path = os.path.join(os.getcwd(), "templates", "marker.png")
+        pick_pixels(default_path)

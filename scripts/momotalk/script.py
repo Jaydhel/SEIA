@@ -7,7 +7,7 @@ import sys
 # Enable DEBUG logging
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(name)s:%(message)s')
 
-PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
 if PARENT_DIR not in sys.path:
     sys.path.insert(0, PARENT_DIR)
 
