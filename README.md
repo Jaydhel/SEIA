@@ -1,4 +1,4 @@
-# Seia (State Evaluated Image Automation)
+# SEIA (State Evaluated Image Automation)
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
