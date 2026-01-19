@@ -137,4 +137,4 @@ PRs are welcome. Keep changes Windows-focused and avoid non-ASCII unless needed.
 
 ## License
 
-Not specified yet.
+MIT. See `LICENSE`.
