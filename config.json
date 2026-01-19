@@ -1,0 +1,37 @@
+{
+  "target": {
+    "window_title_substring": "Blue Archive",
+    "process_name": ""
+  },
+  "reference_resolution": {
+    "w": 1920,
+    "h": 1080
+  },
+  "render_area": {
+    "mode": "stretch",
+    "offset": {
+      "x": 0,
+      "y": 0
+    },
+    "size": {
+      "w": 0,
+      "h": 0
+    }
+  },
+  "marker_detection": {
+    "method": "template",
+    "threshold": 0.8,
+    "min_score_delta": 0.02,
+    "use_pixel_verification": false
+  },
+  "input": {
+    "mouse_motion": "instant",
+    "mouse_motion_duration_ms": 0,
+    "mouse_motion_fps": 60,
+    "mouse_jitter_px": 0
+  },
+  "debug": {
+    "log": true,
+    "screenshot": false
+  }
+}
