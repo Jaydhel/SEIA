@@ -1,9 +1,15 @@
-# SEIA (State Evaluated Image Automation)
 
-![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![OpenCV](https://img.shields.io/badge/OpenCV-27338e?style=for-the-badge&logo=opencv&logoColor=white)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d7be34df-c6d1-403e-bea0-070c4dfcf4cc" width="300">
+</p>
+<h1 align="center">SEIA</h1>
+<h4 align="center">(State Evaluated Image Automation)</h4>
+<p align="center">
+  <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/OpenCV-27338e?style=for-the-badge&logo=opencv&logoColor=white">
+</p>
+<hr>
 Seia is a Windows screen automation harness for games and desktop apps. It uses
 screen capture, template matching, and optional pixel verification to help you
 build simple scripts without memory access, injection, or hooks.
