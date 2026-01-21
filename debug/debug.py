@@ -74,11 +74,16 @@ def _sample_config() -> Dict[str, Any]:
             "overlay": True,
         },
         "test_input": {
-            "enabled": False,
+            "enabled": True,
             "hotkeys": {
                 "click_point": "ctrl+f6",
                 "press_esc": "ctrl+f7",
-                "scroll_down": "ctrl+f2",
+                "scroll_up": "ctrl+z",
+                "scroll_down": "ctrl+x",
+                "set_scroll_amount": "ctrl+shift+f2",
+                "drag": "ctrl+shift+d",
+                "set_drag_start": "ctrl+alt+1",
+                "set_drag_end": "ctrl+alt+2",
                 "set_marker_near": "ctrl+f1",
                 "click_marker": "ctrl+f9",
                 "click_mouse": "ctrl+f11",
@@ -88,6 +93,13 @@ def _sample_config() -> Dict[str, Any]:
             },
             "click_point": {"x": 960, "y": 540},
             "scroll_amount": 500,
+            "scroll_events": 1,
+            "drag_start": {"x": 960, "y": 540},
+            "drag_end": {"x": 960, "y": 740},
+            "drag_hold_s": 0.0,
+            "drag_duration_s": 0.25,
+            "drag_button": "left",
+            "drag_use_ref": True,
             "marker_click_offset": {"x": 0, "y": 0},
             "marker_near": {"x": 0, "y": 0},
             "marker_radius": 0
@@ -362,11 +374,16 @@ def main() -> None:
     debug_overlay = bool(debug_cfg.get("overlay", True))
 
     test_input_cfg = config.get("test_input", {})
-    test_enabled = bool(test_input_cfg.get("enabled", False))
+    test_enabled = bool(test_input_cfg.get("enabled", True))
     test_hotkeys = test_input_cfg.get("hotkeys", {})
     test_click_hotkey = test_hotkeys.get("click_point", "ctrl+f6")
     test_esc_hotkey = test_hotkeys.get("press_esc", "ctrl+f7")
-    test_scroll_hotkey = test_hotkeys.get("scroll_down", "ctrl+f2")
+    test_scroll_up_hotkey = test_hotkeys.get("scroll_up", "ctrl+z")
+    test_scroll_hotkey = test_hotkeys.get("scroll_down", "ctrl+x")
+    test_set_scroll_amount_hotkey = test_hotkeys.get("set_scroll_amount", "ctrl+shift+f2")
+    test_drag_hotkey = test_hotkeys.get("drag", "ctrl+shift+d")
+    test_set_drag_start_hotkey = test_hotkeys.get("set_drag_start", "ctrl+alt+1")
+    test_set_drag_end_hotkey = test_hotkeys.get("set_drag_end", "ctrl+alt+2")
     test_set_marker_near_hotkey = test_hotkeys.get("set_marker_near", "ctrl+f1")
     test_click_marker_hotkey = test_hotkeys.get("click_marker", "ctrl+f9")
     test_click_mouse_hotkey = test_hotkeys.get("click_mouse", "ctrl+f11")
@@ -375,6 +392,15 @@ def main() -> None:
     test_set_marker_offset_hotkey = test_hotkeys.get("set_marker_offset", "ctrl+f3")
     test_click_point = test_input_cfg.get("click_point", {"x": 0, "y": 0})
     scroll_amount = int(test_input_cfg.get("scroll_amount", 500))
+    scroll_events = max(1, int(test_input_cfg.get("scroll_events", 1)))
+    drag_start_cfg = test_input_cfg.get("drag_start", {"x": 0, "y": 0})
+    drag_end_cfg = test_input_cfg.get("drag_end", {"x": 0, "y": 0})
+    drag_start = (int(drag_start_cfg.get("x", 0)), int(drag_start_cfg.get("y", 0)))
+    drag_end = (int(drag_end_cfg.get("x", 0)), int(drag_end_cfg.get("y", 0)))
+    drag_hold_s = max(0.0, float(test_input_cfg.get("drag_hold_s", 0.0)))
+    drag_duration_s = max(0.0, float(test_input_cfg.get("drag_duration_s", 0.25)))
+    drag_button = str(test_input_cfg.get("drag_button", "left") or "left")
+    drag_use_ref = bool(test_input_cfg.get("drag_use_ref", True))
     marker_click_offset_cfg = test_input_cfg.get("marker_click_offset", {"x": 0, "y": 0})
     marker_click_offset = (int(marker_click_offset_cfg.get("x", 0)), int(marker_click_offset_cfg.get("y", 0)))
     marker_near_cfg = test_input_cfg.get("marker_near", {"x": 0, "y": 0})
@@ -471,7 +497,9 @@ def main() -> None:
         nonlocal marker_method, marker_threshold, marker_min_score_delta, marker_bypass_threshold, template_path, pixel_points, marker_detector
         nonlocal change_method, change_delta_threshold, change_smoothing, delta_detector
         nonlocal debug_save_frames, debug_save_on_toggle_only, debug_save_every_n, debug_output_dir, debug_overlay
-        nonlocal test_enabled, test_click_point, scroll_amount, marker_click_offset, marker_near, marker_radius
+        nonlocal test_enabled, test_click_point, scroll_amount, scroll_events
+        nonlocal drag_start, drag_end, drag_hold_s, drag_duration_s, drag_button, drag_use_ref
+        nonlocal marker_click_offset, marker_near, marker_radius
 
         poll_interval_ms = int(new_config.get("poll_interval_ms", poll_interval_ms))
         ref_size = _get_ref_size(new_config)
@@ -516,6 +544,21 @@ def main() -> None:
         test_enabled = bool(test_input_cfg.get("enabled", test_enabled))
         test_click_point = test_input_cfg.get("click_point", test_click_point)
         scroll_amount = int(test_input_cfg.get("scroll_amount", scroll_amount))
+        scroll_events = max(1, int(test_input_cfg.get("scroll_events", scroll_events)))
+        drag_start_cfg = test_input_cfg.get("drag_start", {"x": drag_start[0], "y": drag_start[1]})
+        drag_end_cfg = test_input_cfg.get("drag_end", {"x": drag_end[0], "y": drag_end[1]})
+        drag_start = (
+            int(drag_start_cfg.get("x", drag_start[0])),
+            int(drag_start_cfg.get("y", drag_start[1])),
+        )
+        drag_end = (
+            int(drag_end_cfg.get("x", drag_end[0])),
+            int(drag_end_cfg.get("y", drag_end[1])),
+        )
+        drag_hold_s = max(0.0, float(test_input_cfg.get("drag_hold_s", drag_hold_s)))
+        drag_duration_s = max(0.0, float(test_input_cfg.get("drag_duration_s", drag_duration_s)))
+        drag_button = str(test_input_cfg.get("drag_button", drag_button) or drag_button)
+        drag_use_ref = bool(test_input_cfg.get("drag_use_ref", drag_use_ref))
         marker_click_offset_cfg = test_input_cfg.get("marker_click_offset", {"x": 0, "y": 0})
         marker_click_offset = (
             int(marker_click_offset_cfg.get("x", marker_click_offset[0])),
@@ -572,6 +615,26 @@ def main() -> None:
     def do_scroll_down() -> None:
         if test_enabled:
             enqueue_action("scroll_down")
+
+    def do_scroll_up() -> None:
+        if test_enabled:
+            enqueue_action("scroll_up")
+
+    def do_drag() -> None:
+        if test_enabled:
+            enqueue_action("drag")
+
+    def do_set_drag_start() -> None:
+        if test_enabled:
+            enqueue_action("set_drag_start")
+
+    def do_set_drag_end() -> None:
+        if test_enabled:
+            enqueue_action("set_drag_end")
+
+    def do_set_scroll_amount() -> None:
+        if test_enabled:
+            enqueue_action("set_scroll_amount")
 
     def do_set_marker_near() -> None:
         if test_enabled:
@@ -647,24 +710,41 @@ def main() -> None:
         logging.info("  %s  reload config/template", RELOAD_HOTKEY)
         logging.info("  %s  toggle monitoring", MONITOR_HOTKEY)
         logging.info("  %s  exit", EXIT_HOTKEY)
-        if test_enabled:
-            logging.info("Test hotkeys:")
-            logging.info("  %s  click point", test_click_hotkey)
-            logging.info("  %s  press ESC", test_esc_hotkey)
-            logging.info("  %s  scroll down", test_scroll_hotkey)
-            logging.info("  %s  set marker near", test_set_marker_near_hotkey)
-            logging.info("  %s  click marker", test_click_marker_hotkey)
-            logging.info("  %s  click mouse", test_click_mouse_hotkey)
-            logging.info("  %s  log mouse", test_log_mouse_hotkey)
-            logging.info("  %s  toggle mouse tracking", test_track_mouse_hotkey)
-            logging.info("  %s  set marker offset", test_set_marker_offset_hotkey)
-            logging.info(
-                "Marker offset current: %d,%d",
-                marker_click_offset[0],
-                marker_click_offset[1],
-            )
-            marker_near_label = "none" if marker_near is None else f"{marker_near[0]},{marker_near[1]}"
-            logging.info("Marker near current: %s radius %d", marker_near_label, marker_radius)
+        logging.info("Test hotkeys:")
+        logging.info("  %s  click point", test_click_hotkey)
+        logging.info("  %s  press ESC", test_esc_hotkey)
+        logging.info("  %s  scroll up", test_scroll_up_hotkey)
+        logging.info("  %s  scroll down", test_scroll_hotkey)
+        logging.info("  %s  set scroll amount", test_set_scroll_amount_hotkey)
+        logging.info("  %s  drag", test_drag_hotkey)
+        logging.info("  %s  set drag start (use mouse or input)", test_set_drag_start_hotkey)
+        logging.info("  %s  set drag end (use mouse or input)", test_set_drag_end_hotkey)
+        logging.info("  %s  set marker near", test_set_marker_near_hotkey)
+        logging.info("  %s  click marker", test_click_marker_hotkey)
+        logging.info("  %s  click mouse", test_click_mouse_hotkey)
+        logging.info("  %s  log mouse", test_log_mouse_hotkey)
+        logging.info("  %s  toggle mouse tracking", test_track_mouse_hotkey)
+        logging.info("  %s  set marker offset", test_set_marker_offset_hotkey)
+        logging.info("Scroll amount current: %d events %d", scroll_amount, scroll_events)
+        drag_space = "ref" if drag_use_ref else "screen"
+        logging.info(
+            "Drag current: %d,%d -> %d,%d %s hold %.2fs duration %.2fs button %s",
+            drag_start[0],
+            drag_start[1],
+            drag_end[0],
+            drag_end[1],
+            drag_space,
+            drag_hold_s,
+            drag_duration_s,
+            drag_button,
+        )
+        logging.info(
+            "Marker offset current: %d,%d",
+            marker_click_offset[0],
+            marker_click_offset[1],
+        )
+        marker_near_label = "none" if marker_near is None else f"{marker_near[0]},{marker_near[1]}"
+        logging.info("Marker near current: %s radius %d", marker_near_label, marker_radius)
         logging.info("Monitoring currently %s", "ON" if state["monitoring"] else "OFF")
 
     nonlocal_vars = {
@@ -679,7 +759,12 @@ def main() -> None:
     if test_enabled:
         keyboard.add_hotkey(test_click_hotkey, do_test_click)
         keyboard.add_hotkey(test_esc_hotkey, do_test_esc)
+        keyboard.add_hotkey(test_scroll_up_hotkey, do_scroll_up)
         keyboard.add_hotkey(test_scroll_hotkey, do_scroll_down)
+        keyboard.add_hotkey(test_set_scroll_amount_hotkey, do_set_scroll_amount)
+        keyboard.add_hotkey(test_drag_hotkey, do_drag)
+        keyboard.add_hotkey(test_set_drag_start_hotkey, do_set_drag_start)
+        keyboard.add_hotkey(test_set_drag_end_hotkey, do_set_drag_end)
         keyboard.add_hotkey(test_set_marker_near_hotkey, do_set_marker_near)
         keyboard.add_hotkey(test_click_marker_hotkey, do_click_marker)
         keyboard.add_hotkey(test_click_mouse_hotkey, do_click_mouse)
@@ -726,8 +811,154 @@ def main() -> None:
                     continue
                 if action == "scroll_down":
                     amount = max(1, abs(scroll_amount))
-                    logging.info("Scroll down by %d", amount)
-                    _scroll_wheel(-amount)
+                    events = max(1, int(scroll_events))
+                    logging.info("Scroll down by %d events %d", amount, events)
+                    for _ in range(events):
+                        _scroll_wheel(-amount)
+                    continue
+                if action == "scroll_up":
+                    amount = max(1, abs(scroll_amount))
+                    events = max(1, int(scroll_events))
+                    logging.info("Scroll up by %d events %d", amount, events)
+                    for _ in range(events):
+                        _scroll_wheel(amount)
+                    continue
+                if action == "drag":
+                    if is_window_minimized(hwnd):
+                        logging.warning("Window is minimized; drag skipped.")
+                        continue
+                    try:
+                        origin_x, origin_y, client_w, client_h = get_client_origin_and_size(hwnd)
+                    except Exception as exc:
+                        logging.error("Failed to read window metrics: %s", exc)
+                        continue
+                    if client_w == 0 or client_h == 0:
+                        logging.warning("Client size is zero; drag skipped.")
+                        continue
+                    render_x, render_y, render_w, render_h = _compute_render_rect(
+                        (origin_x, origin_y), (client_w, client_h), ref_size, render_cfg
+                    )
+                    if drag_use_ref:
+                        start_x, start_y = map_point(
+                            drag_start,
+                            ref_size,
+                            (render_x, render_y),
+                            (render_w, render_h),
+                        )
+                        end_x, end_y = map_point(
+                            drag_end,
+                            ref_size,
+                            (render_x, render_y),
+                            (render_w, render_h),
+                        )
+                        space = "ref"
+                    else:
+                        start_x, start_y = drag_start
+                        end_x, end_y = drag_end
+                        space = "screen"
+                    logging.info(
+                        "Dragging %d,%d -> %d,%d (%s) hold %.2fs duration %.2fs button %s",
+                        start_x,
+                        start_y,
+                        end_x,
+                        end_y,
+                        space,
+                        drag_hold_s,
+                        drag_duration_s,
+                        drag_button,
+                    )
+                    pydirectinput.moveTo(int(start_x), int(start_y), duration=0.0)
+                    try:
+                        pydirectinput.mouseDown(button=drag_button)
+                    except TypeError:
+                        pydirectinput.mouseDown(int(start_x), int(start_y))
+                    if drag_hold_s > 0:
+                        time.sleep(drag_hold_s)
+                    pydirectinput.moveTo(
+                        int(end_x),
+                        int(end_y),
+                        duration=max(0.0, float(drag_duration_s)),
+                    )
+                    try:
+                        pydirectinput.mouseUp(button=drag_button)
+                    except TypeError:
+                        pydirectinput.mouseUp(int(end_x), int(end_y))
+                    continue
+                if action in {"set_drag_start", "set_drag_end"}:
+                    was_monitoring = state["monitoring"]
+                    state["monitoring"] = False
+                    label = "start" if action == "set_drag_start" else "end"
+                    current = drag_start if action == "set_drag_start" else drag_end
+                    space_label = "ref" if drag_use_ref else "screen"
+                    print("")
+                    prompt = (
+                        f"Enter drag {label} x,y ({space_label} coords). "
+                        "Blank = use current mouse: "
+                    )
+                    entry = input(prompt)
+                    parsed = _parse_offset_text(entry)
+                    if parsed is None and not entry.strip():
+                        x, y = _get_cursor_pos()
+                        if drag_use_ref:
+                            if is_window_minimized(hwnd):
+                                logging.warning("Window is minimized; drag %s unchanged.", label)
+                            else:
+                                try:
+                                    origin_x, origin_y, client_w, client_h = get_client_origin_and_size(hwnd)
+                                except Exception as exc:
+                                    logging.error("Failed to read window metrics: %s", exc)
+                                else:
+                                    render_x, render_y, render_w, render_h = _compute_render_rect(
+                                        (origin_x, origin_y), (client_w, client_h), ref_size, render_cfg
+                                    )
+                                    scale_x = render_w / ref_size[0] if ref_size[0] else 0.0
+                                    scale_y = render_h / ref_size[1] if ref_size[1] else 0.0
+                                    if scale_x > 0 and scale_y > 0:
+                                        parsed = (
+                                            int(round((x - render_x) / scale_x)),
+                                            int(round((y - render_y) / scale_y)),
+                                        )
+                                    else:
+                                        logging.warning("Render scale invalid; drag %s unchanged.", label)
+                        else:
+                            parsed = (x, y)
+                    if parsed is None:
+                        logging.info(
+                            "Drag %s unchanged: %d,%d (%s coords)",
+                            label,
+                            current[0],
+                            current[1],
+                            space_label,
+                        )
+                    else:
+                        if action == "set_drag_start":
+                            drag_start = parsed
+                        else:
+                            drag_end = parsed
+                        logging.info(
+                            "Drag %s set to %d,%d (%s coords)",
+                            label,
+                            parsed[0],
+                            parsed[1],
+                            space_label,
+                        )
+                    if was_monitoring:
+                        state["monitoring"] = True
+                    continue
+                if action == "set_scroll_amount":
+                    was_monitoring = state["monitoring"]
+                    state["monitoring"] = False
+                    print("")
+                    prompt = f"Enter scroll amount (current {scroll_amount}, blank keep): "
+                    entry = input(prompt)
+                    parsed = _parse_int(entry)
+                    if parsed is None:
+                        logging.info("Scroll amount unchanged: %d", scroll_amount)
+                    else:
+                        scroll_amount = max(1, abs(parsed))
+                        logging.info("Scroll amount set to %d", scroll_amount)
+                    if was_monitoring:
+                        state["monitoring"] = True
                     continue
                 if action == "click_mouse":
                     x, y = _get_cursor_pos()

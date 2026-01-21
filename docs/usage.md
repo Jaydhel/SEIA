@@ -102,3 +102,31 @@ In scripts:
 In debug harness (defaults, configurable in config.json):
 - `Ctrl+F5`: log mouse position once.
 - `Ctrl+Shift+F5`: toggle mouse tracking.
+- `Ctrl+Z`: scroll up.
+- `Ctrl+X`: scroll down.
+- `Ctrl+Shift+F2`: set scroll amount.
+- `Ctrl+Shift+D`: drag (uses `test_input.drag_*` config).
+- `Ctrl+Alt+1`: set drag start (blank prompt uses current mouse).
+- `Ctrl+Alt+2`: set drag end (blank prompt uses current mouse).
+
+Drag config (debug harness):
+- `test_input.drag_start` and `test_input.drag_end` (ref or screen coordinates).
+- `test_input.drag_hold_s` and `test_input.drag_duration_s`.
+- `test_input.drag_button` (`left` or `right`).
+- `test_input.drag_use_ref` (true = ref coords, false = screen coords).
+
+Scroll config (debug harness):
+- `test_input.scroll_amount` (per event).
+- `test_input.scroll_events` (number of events per hotkey press).
+
+## Advanced input
+
+If you need full control, use `engine/core.py`:
+
+```python
+from engine.core import AutomationEngine
+
+engine = AutomationEngine("config.json")
+engine.drag_ref((960, 540), (960, 740), hold_s=0.05, drag_duration_s=0.25)
+engine.drag_screen((100, 200), (100, 500), drag_duration_s=0.2)
+```

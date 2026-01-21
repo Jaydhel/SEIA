@@ -122,6 +122,7 @@ For lower-level control, use `engine/core.py`.
 ## Tools
 
 - ROI picker: `python debug\roi_picker.py`
+- Drag picker: `python debug\drag_picker.py`
 - Debug harness hotkeys are printed in the console on startup.
 
 ## Docs

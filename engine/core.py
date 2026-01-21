@@ -431,6 +431,149 @@ class AutomationEngine:
             if step < steps:
                 time.sleep(duration / steps)
 
+    def drag_screen(
+        self,
+        start: Tuple[int, int],
+        end: Tuple[int, int],
+        hold_s: float = 0.0,
+        drag_duration_s: float = 0.5,
+        button: str = "left",
+        settle_s: float = 1.0,
+        begin_sleep_s: float = 0.0,
+        end_sleep_s: float = 0.0,
+    ) -> None:
+        """
+        Perform a drag operation from start to end position.
+        
+        Args:
+            start: Starting (x, y) screen coordinates
+            end: Ending (x, y) screen coordinates
+            hold_s: Time to hold at START position after pressing mouse button (before drag motion)
+            drag_duration_s: Duration of the drag motion itself
+            button: Mouse button to use ("left", "right", "middle")
+            settle_s: Time to hold at END position BEFORE releasing mouse button (kills velocity/momentum)
+            begin_sleep_s: Time to sleep BEFORE pressing mouse button at start
+            end_sleep_s: Time to sleep AFTER releasing mouse button at end
+        """
+        start_x, start_y = int(start[0]), int(start[1])
+        end_x, end_y = int(end[0]), int(end[1])
+        
+        # Move to start position
+        pydirectinput.moveTo(start_x, start_y, duration=0.0)
+        
+        # Optional: sleep before pressing button
+        if begin_sleep_s > 0:
+            time.sleep(max(0.0, float(begin_sleep_s)))
+        
+        # Press mouse button to start drag
+        try:
+            pydirectinput.mouseDown(button=button)
+        except TypeError:
+            pydirectinput.mouseDown(start_x, start_y)
+        
+        # Hold at start position after pressing button
+        if hold_s > 0:
+            time.sleep(max(0.0, float(hold_s)))
+        
+        # Perform drag motion with native SetCursorPos for maximum smoothness
+        if drag_duration_s > 0:
+            try:
+                import ctypes
+                user32 = ctypes.windll.user32
+                use_native = True
+            except:
+                use_native = False
+            
+            drag_start_time = time.perf_counter()
+            prev_x, prev_y = start_x, start_y
+            last_move_time = drag_start_time
+            
+            while True:
+                now = time.perf_counter()
+                elapsed = now - drag_start_time
+                t = min(1.0, elapsed / drag_duration_s)
+                
+                # Use ease for smoother drag
+                ease_t = t * t * (3.0 - 2.0 * t)
+                x = start_x + (end_x - start_x) * ease_t
+                y = start_y + (end_y - start_y) * ease_t
+                
+                curr_x, curr_y = int(round(x)), int(round(y))
+                
+                # Only move when pixel position changes
+                if curr_x != prev_x or curr_y != prev_y:
+                    if use_native:
+                        user32.SetCursorPos(curr_x, curr_y)
+                    else:
+                        pydirectinput.moveTo(curr_x, curr_y, duration=0.0)
+                    prev_x, prev_y = curr_x, curr_y
+                    last_move_time = time.perf_counter()
+                
+                if t >= 1.0:
+                    # Ensure final position
+                    if prev_x != end_x or prev_y != end_y:
+                        if use_native:
+                            user32.SetCursorPos(end_x, end_y)
+                        else:
+                            pydirectinput.moveTo(end_x, end_y, duration=0.0)
+                        last_move_time = time.perf_counter()
+                    break
+                
+                # Minimal sleep for smooth motion
+                time.sleep(0.001)
+        else:
+            pydirectinput.moveTo(end_x, end_y, duration=0.0)
+            last_move_time = time.perf_counter()
+        
+        # Hold at end position BEFORE releasing to kill velocity/momentum
+        if settle_s > 0:
+            time_since_last_move = time.perf_counter() - last_move_time
+            remaining_settle = settle_s - time_since_last_move
+            if remaining_settle > 0:
+                time.sleep(remaining_settle)
+        
+        # Release mouse button to end drag
+        try:
+            pydirectinput.mouseUp(button=button)
+        except TypeError:
+            pydirectinput.mouseUp(end_x, end_y)
+        
+        # Optional: sleep after releasing button
+        if end_sleep_s > 0:
+            time.sleep(max(0.0, float(end_sleep_s)))
+
+    def drag_ref(
+        self,
+        start_ref: Tuple[int, int],
+        end_ref: Tuple[int, int],
+        hold_s: float = 0.0,
+        drag_duration_s: float = 0.5,
+        button: str = "left",
+        settle_s: float = 1.0,
+        begin_sleep_s: float = 0.0,
+        end_sleep_s: float = 0.0,
+    ) -> None:
+        """
+        Perform a drag operation using reference coordinates.
+        
+        Args:
+            start_ref: Starting (x, y) reference coordinates
+            end_ref: Ending (x, y) reference coordinates
+            hold_s: Time to hold at START position after pressing mouse button (before drag motion)
+            drag_duration_s: Duration of the drag motion itself
+            button: Mouse button to use ("left", "right", "middle")
+            settle_s: Time to hold at END position BEFORE releasing mouse button (kills velocity/momentum)
+            begin_sleep_s: Time to sleep BEFORE pressing mouse button at start
+            end_sleep_s: Time to sleep AFTER releasing mouse button at end
+        """
+        _, _, render_rect, scale_x, scale_y = self._get_window_metrics()
+        render_x, render_y = render_rect[0], render_rect[1]
+        start_x = int(round(render_x + start_ref[0] * scale_x))
+        start_y = int(round(render_y + start_ref[1] * scale_y))
+        end_x = int(round(render_x + end_ref[0] * scale_x))
+        end_y = int(round(render_y + end_ref[1] * scale_y))
+        self.drag_screen((start_x, start_y), (end_x, end_y), hold_s, drag_duration_s, button, settle_s, begin_sleep_s, end_sleep_s)
+
     def _click_at(self, x: int, y: int, click_duration: float) -> None:
         if click_duration > 0:
             try:
